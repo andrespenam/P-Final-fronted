@@ -2,30 +2,42 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import SideMedia from "../components/SideMedia";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const Register = () => {
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-    });
+export default function Register() {
+    const navigate = useNavigate();
+    const { register } = useAuth();
+    const [form, setForm] = useState({ name: "", email: "", password: "" });
+    const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        localStorage.setItem("user", JSON.stringify(form));
+        try {
+            const data = await register(form.name, form.email, form.password);
 
-        Swal.fire({
-            icon: "success",
-            title: "Registro exitoso",
-            text: "Ahora podés iniciar sesión",
-        });
+            Swal.fire({
+                icon: "success",
+                title: "Registro exitoso",
+                text: data?.token ? "Ya estás logueado" : "Ahora podés iniciar sesión",
+                showConfirmButton: false,
+                timer: 1500,
+            });
 
-        setForm({ name: "", email: "", password: "" });
+            setForm({ name: "", email: "", password: "" });
+            navigate(data?.token ? "/dashboard" : "/login", { replace: true });
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: err?.message || "Error registrando",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -42,6 +54,7 @@ const Register = () => {
                                 value={form.name}
                                 onChange={handleChange}
                                 placeholder="Tu nombre"
+                                autoComplete="name"
                             />
                         </Form.Group>
 
@@ -53,6 +66,7 @@ const Register = () => {
                                 value={form.email}
                                 onChange={handleChange}
                                 placeholder="Tu email"
+                                autoComplete="email"
                             />
                         </Form.Group>
 
@@ -64,18 +78,19 @@ const Register = () => {
                                 value={form.password}
                                 onChange={handleChange}
                                 placeholder="Tu contraseña"
+                                autoComplete="new-password"
                             />
                         </Form.Group>
 
-                        <Button type="submit" className="w-100">
-                            Registrarse
+                        <Button type="submit" className="w-100" disabled={loading}>
+                            {loading ? "Registrando..." : "Registrarse"}
                         </Button>
                     </Form>
+
                     <p className="text-muted mt-3 text-center">
-                        ¿Ya tenés cuenta? <a href="/login">Ingresar</a>
+                        ¿Ya tenés cuenta? <Link to="/login">Ingresar</Link>
                     </p>
                 </Col>
-                
 
                 <Col md={6}>
                     <SideMedia video="/videos/panaderia.mp4" />
@@ -83,7 +98,4 @@ const Register = () => {
             </Row>
         </Container>
     );
-};
-
-export default Register;
-
+}

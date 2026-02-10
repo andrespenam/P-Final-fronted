@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NavbarComponent from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -9,11 +9,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
-import { UserProvider } from "./context/UserContext";
 
 const App = () => {
   return (
-    <UserProvider>
     <BrowserRouter>
       <div className="app-wrapper">
         <NavbarComponent />
@@ -23,17 +21,22 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<Products />} />
             <Route path="/pedido" element={<Cart />} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Register />} />
+            <Route path="/register" element={<Navigate to="/registro" replace />} />
+            <Route path="/ingresar" element={<Navigate to="/login" replace />} />
+
             <Route path="/contacto" element={<Contact />} />
             <Route path="/acerca" element={<About />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
 
         <Footer />
       </div>
     </BrowserRouter>
-    </UserProvider>
   );
 };
 
