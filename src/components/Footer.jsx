@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="bg-light border-top py-3 mt-auto">
       <Container className="text-center">
         <small className="text-muted">
-          © 2026 Panadería y Market D´Pieri · Proyecto Frontend By Andrés Peña.
+          © 2026 Panadería y Market D´Pieri · Proyecto Frontend and Backend By Andrés Peña.
         </small>
       </Container>
     </footer>
